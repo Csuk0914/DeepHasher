@@ -2,6 +2,7 @@ import numpy as np
 import pydicom
 import os
 import csv
+import pickle
 # import matplotlib.pyplot as plt
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
@@ -174,27 +175,22 @@ class HashingNet(nn.Module):
         self.nn1 = nn.Sequential(
             nn.Conv2d(1, 96, 5, padding=2),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),
+            nn.MaxPool2d(4, stride=4),
             nn.LocalResponseNorm(2),
 
-            nn.Conv2d(96, 256, 3, padding=1),
+            nn.Conv2d(96, 128, 3, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),
+            nn.MaxPool2d(4, stride=4),
             nn.LocalResponseNorm(2),
 
-            nn.Conv2d(256, 384, 3, padding=1),
+            nn.Conv2d(128, 256, 3, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),
+            nn.MaxPool2d(5, stride=5),
             nn.LocalResponseNorm(2),
-
-            nn.Conv2d(384, 256, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.ReLU(inplace=True),
         )
 
         self.nn2 = nn.Sequential(
-            nn.Linear(640000, 1024),
+            nn.Linear(6400, 1024),
             nn.ReLU(inplace=True),
             nn.Linear(1024, 512),
             nn.ReLU(inplace=True),
@@ -211,7 +207,7 @@ class HashingNet(nn.Module):
 weights_dir = './params.pth.tar'
 
 # Training process setup
-slice_train = SliceDateSet(data_dir='../test', data_size=1000, slice_sz=400)
+slice_train = SliceDateSet(data_dir='../data_train/')
 train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
 
 # Training the net
@@ -249,5 +245,9 @@ for epoch in range(total_epoch):
             iteration += 20
             counter.append(iteration)
             loss_history.append(mse_loss.data[0])
+
+total_hist = [counter, loss_history]
+with open("training_hist.txt", "wb") as fp:
+    pickle.dump(total_hist, fp)
 
 
