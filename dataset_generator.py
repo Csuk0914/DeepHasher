@@ -13,8 +13,11 @@ num_train_imgs = 30000
 num_test_imgs = 1000
 label_train = np.zeros([num_train_imgs, 9])
 label_test = np.zeros([num_test_imgs, 9])
-data_train_path = "../data/bjiang8/data_train/"
-data_test_path = "../data/bjiang8/data_test/"
+# for marcc
+# data_train_path = "../data/bjiang8/data_train/"
+# data_test_path = "../data/bjiang8/data_test/"
+# for camp pc
+data_train_path = "X:/Baichuan_Files/data/data_train/"
 
 # Read volume data from /test folder
 dirname = '../test'
@@ -69,7 +72,7 @@ for img_id in range(num_train_imgs):
     img_pth = os.path.join(data_train_path, 'img_(%d).png' % img_id)
     im.save(img_pth)
     # Print out process
-    if img_id % (num_train_imgs/10) == 0:
+    if img_id % (num_train_imgs/100) == 0:
         print("Generated %d images, of total %d images" % (img_id, num_train_imgs))
 
 label_pth = os.path.join(data_train_path, 'label.csv')
