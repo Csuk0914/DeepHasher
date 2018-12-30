@@ -1,8 +1,10 @@
 import numpy as np
 import pydicom
 import os
+import csv
 # import matplotlib.pyplot as plt
 from scipy.interpolate import RegularGridInterpolator
+from PIL import Image
 
 import torch
 import torch.nn as nn
@@ -52,7 +54,7 @@ def randTrans4x4(debug=False):
 
 
 # Define dataset class
-class SliceDateSet(Dataset):
+class SliceDateSetUnlimited(Dataset):
     """slice data set."""
 
     def __init__(self, data_dir='./test', data_size=1000, slice_sz=400):
@@ -127,6 +129,41 @@ class SliceDateSet(Dataset):
         label = trans_anchor_pts[0:3, :].flatten('F')
 
         return random_slice, label
+
+class SliceDateSet(Dataset):
+    """slice data set."""
+
+    def __init__(self, data_dir='../data_train/'):
+        self.data_dir = data_dir
+        self.labels = self.parseFiles(data_dir)
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        # get item based on index
+        img_path = os.path.join(self.data_dir, 'img_(%d).png' % idx)
+        imgPIL = Image.open(img_path)
+        imgPIL.load()
+        imgdata = np.asarray(imgPIL, dtype="uint8")
+        img = torch.from_numpy(imgdata).float()
+
+        label = torch.FloatTensor(self.labels[idx])
+        sample = {'img': img, 'label': label, 'index': idx}
+
+        return sample
+
+    def parseFiles(self, dirName='../data_train/'):
+        label_path = os.path.join(dirName, 'label.csv')
+        with open(label_path) as csvfile:
+            data = csv.reader(csvfile, delimiter=",")
+            labels = []
+            rownum = 0
+            for row in data:
+                labels.append(row)
+                labels[rownum] = [float(i) for i in labels[rownum]]
+                rownum += 1
+        return labels
 
 
 # Define deep neural network
