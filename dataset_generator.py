@@ -9,10 +9,12 @@ from PIL import Image
 # import matplotlib.pyplot as plt
 
 # Set image files
-num_train_imgs = 30
-num_test_imgs = 10
+num_train_imgs = 30000
+num_test_imgs = 1000
 label_train = np.zeros([num_train_imgs, 9])
 label_test = np.zeros([num_test_imgs, 9])
+data_train_path = "../data/bjiang8/data_train/"
+data_test_path = "../data/bjiang8/data_test/"
 
 # Read volume data from /test folder
 dirname = '../test'
@@ -64,5 +66,11 @@ for img_id in range(num_train_imgs):
     label_train[img_id, :] = label
     # Save image
     im = Image.fromarray(random_slice)
-    im.save("../data_train/img_(%d).png" % img_id)
-np.savetxt("../data_train/label.csv", label_train, delimiter=",")
+    img_pth = os.path.join(data_train_path, 'img_(%d).png' % img_id)
+    im.save(img_pth)
+    # Print out process
+    if img_id % (num_train_imgs/10) == 0:
+        print("Generated %d images, of total %d images" % (img_id, num_train_imgs))
+
+label_pth = os.path.join(data_train_path, 'label.csv')
+np.savetxt(label_pth, label_train, delimiter=",")
