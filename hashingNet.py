@@ -134,9 +134,10 @@ class SliceDateSetUnlimited(Dataset):
 class SliceDateSet(Dataset):
     """slice data set."""
 
-    def __init__(self, data_dir='../data_train/'):
+    def __init__(self, data_dir='../data_train/', slice_sz = 400):
         self.data_dir = data_dir
         self.labels = self.parseFiles(data_dir)
+        self.slice_sz = slice_sz
 
     def __len__(self):
         return len(self.labels)
@@ -148,6 +149,7 @@ class SliceDateSet(Dataset):
         imgPIL.load()
         imgdata = np.asarray(imgPIL, dtype="uint8")
         img = torch.from_numpy(imgdata).float()
+        img = img.view(1, self.slice_sz, self.slice_sz)
 
         label = torch.FloatTensor(self.labels[idx])
         sample = {'img': img, 'label': label, 'index': idx}
@@ -244,7 +246,7 @@ for epoch in range(total_epoch):
             print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
             iteration += 20
             counter.append(iteration)
-            loss_history.append(mse_loss.data[0])
+            loss_history.append(mse_loss.item())
 
 total_hist = [counter, loss_history]
 with open("training_hist.txt", "wb") as fp:
