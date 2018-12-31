@@ -56,7 +56,7 @@ def randTrans4x4(debug=False):
 
 
 # Define dataset class
-class SliceDateSetUnlimited(Dataset):
+class SliceDataSetUnlimited(Dataset):
     """slice data set."""
 
     def __init__(self, data_dir='./test', data_size=1000, slice_sz=400):
@@ -132,7 +132,7 @@ class SliceDateSetUnlimited(Dataset):
 
         return random_slice, label
 
-class SliceDateSet(Dataset):
+class SliceDataSet(Dataset):
     """slice data set."""
 
     def __init__(self, data_dir='../data_train/', slice_sz = 400):
@@ -210,7 +210,7 @@ class HashingNet(nn.Module):
 weights_dir = './params.pth.tar'
 
 # Training process setup
-# slice_train = SliceDateSet(data_dir='../data_train/')
+# slice_train = SliceDataSet(data_dir='../data_train/')
 slice_train = SliceDataSetUnlimited(data_dir='../test')
 train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
 
