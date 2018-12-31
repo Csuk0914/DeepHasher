@@ -215,7 +215,7 @@ slice_train = SliceDataSetUnlimited(data_dir='../test')
 train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
 
 # Training the net
-net = HashingNet()
+net = HashingNet().cuda()
 optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
 loss_fn = nn.MSELoss()
 total_epoch = configs['epochs']
@@ -234,7 +234,7 @@ for epoch in range(total_epoch):
     for batch_idx, batch_sample in enumerate(train_loader):
         img = batch_sample['img']
         label = batch_sample['label']
-        img, y = Variable(img), Variable(label)
+        img, y = Variable(img).cuda(), Variable(label).cuda()
         optimizer.zero_grad()
         y_pred = net(img)
         mse_loss = loss_fn(y_pred, y)
