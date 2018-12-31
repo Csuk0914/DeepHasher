@@ -1,3 +1,4 @@
+
 import numpy as np
 import pydicom
 import os
@@ -14,10 +15,10 @@ from torch import optim
 from torch.utils.data import Dataset, DataLoader
 
 # Setting up configuration
-configs = {"batch_train": 2, \
+configs = {"batch_train": 8, \
             "batch_test": 4, \
-            "epochs": 10, \
-            "num_workers": 0, \
+            "epochs": 40, \
+            "num_workers": 4, \
             "learning_rate": 1e-6, \
             "loss_margin": 1.0, \
             "decision_thresh": 13}
@@ -209,13 +210,14 @@ class HashingNet(nn.Module):
 weights_dir = './params.pth.tar'
 
 # Training process setup
-slice_train = SliceDateSet(data_dir='../data_train/')
+# slice_train = SliceDateSet(data_dir='../data_train/')
+slice_train = SliceDataSetUnlimited(data_dir='../test')
 train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
 
 # Training the net
 net = HashingNet()
 optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
-loss_fn = nn.MSELoss(reduction='sum')
+loss_fn = nn.MSELoss()
 total_epoch = configs['epochs']
 counter = []
 loss_history = []
@@ -239,8 +241,8 @@ for epoch in range(total_epoch):
         mse_loss.backward()
         optimizer.step()
 
-        if batch_idx == 2:
-            break
+        # if batch_idx == 2:
+            # break
 
         if batch_idx % (len(slice_train)/configs['batch_train']/5) == 0:
             print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
@@ -248,6 +250,7 @@ for epoch in range(total_epoch):
             counter.append(iteration)
             loss_history.append(mse_loss.item())
 
+torch.save(net.state_dict(), weights_dir)
 total_hist = [counter, loss_history]
 with open("training_hist.txt", "wb") as fp:
     pickle.dump(total_hist, fp)
