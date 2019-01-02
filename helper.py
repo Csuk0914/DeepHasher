@@ -31,3 +31,27 @@ def randTrans4x4(debug=False):
         F[3, 3] = 1.0
 
     return F
+
+
+def compute_error(gt, re):
+    # gt for ground truth, re for prediction result
+    gtba = gt[:, 0:3] - gt[:, 3:6]
+    gtbc = gt[:, 6:9] - gt[:, 3:6]
+    gtnormal = np.cross(gtba, gtbc)
+    gtnormal = gtnormal / ((np.linalg.norm(gtnormal, axis=-1))[:, None])
+    gtcenter = (gt[:, 0:3] + gt[:, 3:6] + gt[:, 6:9]) / ((np.ones([gt.shape[0]]) * 3)[:, None])
+
+    reba = re[:, 0:3] - re[:, 3:6]
+    rebc = re[:, 6:9] - re[:, 3:6]
+    renormal = np.cross(reba, rebc)
+    renormal = renormal / ((np.linalg.norm(renormal, axis=-1))[:, None])
+    recenter = (re[:, 0:3] + re[:, 3:6] + re[:, 6:9]) / ((np.ones([re.shape[0]]) * 3)[:, None])
+
+    dotnormal = [np.degrees(np.arccos(np.dot(gtnormal[i, :], renormal[i, :]))) for i in range(gtnormal.shape[0])]
+    diff_normal_avg = np.array(dotnormal).mean()
+
+    diff_center = gtcenter - recenter
+    diff_center = np.linalg.norm(diff_center, axis=-1)
+    diff_center_avg = diff_center.mean()
+
+    return diff_center_avg, diff_normal_avg

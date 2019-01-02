@@ -5,8 +5,6 @@ import os
 from helper import randTrans4x4
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
-# from scipy.ndimage.interpolation import rotate
-# import matplotlib.pyplot as plt
 
 # Set image files
 num_train_imgs = 50000

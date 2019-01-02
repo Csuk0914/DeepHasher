@@ -1,24 +1,15 @@
 
 # Evaluate training result on test dataset
-# import numpy as np
-# import pydicom
-# import os
-# import csv
-#import pickle
-# import matplotlib.pyplot as plt
-#from scipy.interpolate import RegularGridInterpolator
-#from PIL import Image
 from hashingNet import HashingNet, SliceDataSet, configs
+from helper import compute_error
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-#from torch import optim
 from torch.utils.data import DataLoader
 
 if __name__ == "__main__":
-    # execute only if run as a script
     print("running in eval() main function...")
+
     weights_dir = "./params.pth.tar"
     net = HashingNet().cuda()
     net.load_state_dict(torch.load(weights_dir))
@@ -27,15 +18,24 @@ if __name__ == "__main__":
     slice_test = SliceDataSet(data_dir='X:/Baichuan_Files/data/data_test')
     test_loader = DataLoader(slice_test, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
     total_loss = 0.0
+    total_diff_center = 0.0
+    total_diff_normal = 0.0
+
     for batch_idx, batch_sample in enumerate(test_loader):
         img = batch_sample['img']
         label = batch_sample['label']
-        img, y = Variable(img).cuda(), Variable(label).cuda()
+        img, y = img.cuda(), label.cuda()
         y_pred = net(img)
-        mse_loss = loss_fn(y_pred, y)
-
+        y_pred_np = y_pred.to(torch.device("cpu")).detach().numpy()
+        y_np = y.to(torch.device("cpu")).detach().numpy()
+        diff_center, diff_normal = compute_error(y_np, y_pred_np)
+        total_diff_center += diff_center
+        total_diff_normal += diff_normal
+        # if batch_idx==0:
+        #     break
         if batch_idx % (len(slice_test) / configs['batch_test'] / 5) == 0:
-            print("Batch %d Loss %f" % (batch_idx, mse_loss.item()))
-            total_loss += mse_loss.item()
-    mean_loss = total_loss / float(len(slice_test)/configs['batch_test'])
-    print("Average BCE loss on training data is: ", mean_loss)
+            print("Batch %d: translation error %f (mm), rotation error %f (deg). " % (batch_idx, diff_center, diff_normal))
+
+    mean_diff_center = total_diff_center / float(len(slice_test) / configs['batch_test'])
+    mean_diff_normal = total_diff_normal / float(len(slice_test) / configs['batch_test'])
+    print("Average translation error %f (mm), average rotation error %f (deg).", mean_diff_center, mean_diff_normal)
