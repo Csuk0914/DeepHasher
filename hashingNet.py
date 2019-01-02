@@ -16,9 +16,9 @@ from torch.utils.data import Dataset, DataLoader
 
 # Setting up configuration
 configs = {"batch_train": 8, \
-            "batch_test": 4, \
+            "batch_test": 8, \
             "epochs": 40, \
-            "num_workers": 4, \
+            "num_workers": 0, \
             "learning_rate": 1e-6, \
             "loss_margin": 1.0, \
             "decision_thresh": 13}
@@ -206,50 +206,50 @@ class HashingNet(nn.Module):
         output = self.nn2(temp)
         return output
 
+if __name__ == "__main__":
+    weights_dir = './params.pth.tar'
 
-weights_dir = './params.pth.tar'
+    # Training process setup
+    # slice_train = SliceDataSet(data_dir='../data_train/')
+    slice_train = SliceDataSetUnlimited(data_dir='../test')
+    train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
 
-# Training process setup
-# slice_train = SliceDataSet(data_dir='../data_train/')
-slice_train = SliceDataSetUnlimited(data_dir='../test')
-train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
+    # Training the net
+    net = HashingNet().cuda()
+    optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
+    loss_fn = nn.MSELoss()
+    total_epoch = configs['epochs']
+    counter = []
+    loss_history = []
+    iteration = 0
 
-# Training the net
-net = HashingNet().cuda()
-optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
-loss_fn = nn.MSELoss()
-total_epoch = configs['epochs']
-counter = []
-loss_history = []
-iteration = 0
+    # def weights_init(m):
+    #     if isinstance(m, nn.Conv2d):
+    #         xavier(m.weight.data)
+    #         xavier(m.bias.data)
+    #
+    # model.apply(weights_init)
 
-# def weights_init(m):
-#     if isinstance(m, nn.Conv2d):
-#         xavier(m.weight.data)
-#         xavier(m.bias.data)
-#
-# model.apply(weights_init)
+    for epoch in range(total_epoch):
+        for batch_idx, batch_sample in enumerate(train_loader):
+            img = batch_sample['img']
+            label = batch_sample['label']
+            img, y = Variable(img).cuda(), Variable(label).cuda()
+            optimizer.zero_grad()
+            y_pred = net(img)
+            mse_loss = loss_fn(y_pred, y)
+            mse_loss.backward()
+            optimizer.step()
 
-for epoch in range(total_epoch):
-    for batch_idx, batch_sample in enumerate(train_loader):
-        img = batch_sample['img']
-        label = batch_sample['label']
-        img, y = Variable(img).cuda(), Variable(label).cuda()
-        optimizer.zero_grad()
-        y_pred = net(img)
-        mse_loss = loss_fn(y_pred, y)
-        mse_loss.backward()
-        optimizer.step()
+            if batch_idx % (len(slice_train)/configs['batch_train']/5) == 0:
+                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
+                iteration += 20
+                counter.append(iteration)
+                loss_history.append(mse_loss.item())
 
-        if batch_idx % (len(slice_train)/configs['batch_train']/5) == 0:
-            print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
-            iteration += 20
-            counter.append(iteration)
-            loss_history.append(mse_loss.item())
-
-torch.save(net.state_dict(), weights_dir)
-total_hist = [counter, loss_history]
-with open("training_hist.txt", "wb") as fp:
-    pickle.dump(total_hist, fp)
+    torch.save(net.state_dict(), weights_dir)
+    total_hist = [counter, loss_history]
+    with open("training_hist.txt", "wb") as fp:
+        pickle.dump(total_hist, fp)
 
 
