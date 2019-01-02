@@ -241,9 +241,6 @@ for epoch in range(total_epoch):
         mse_loss.backward()
         optimizer.step()
 
-        # if batch_idx == 2:
-            # break
-
         if batch_idx % (len(slice_train)/configs['batch_train']/5) == 0:
             print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
             iteration += 20
