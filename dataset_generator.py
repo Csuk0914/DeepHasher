@@ -9,7 +9,7 @@ from PIL import Image
 # import matplotlib.pyplot as plt
 
 # Set image files
-num_train_imgs = 30000
+num_train_imgs = 50000
 num_test_imgs = 1000
 label_train = np.zeros([num_train_imgs, 9])
 label_test = np.zeros([num_test_imgs, 9])
