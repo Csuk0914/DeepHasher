@@ -152,7 +152,7 @@ class SliceDataSet(Dataset):
         img = torch.from_numpy(imgdata).float()
         img = img.view(1, self.slice_sz, self.slice_sz)
 
-        label = torch.FloatTensor(self.labels[idx])
+        label = torch.FloatTensor(self.labels[idx][-9:])
         sample = {'img': img, 'label': label, 'index': idx}
 
         return sample
