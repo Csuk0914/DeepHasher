@@ -206,6 +206,42 @@ class HashingNet(nn.Module):
         output = self.nn2(temp)
         return output
 
+# Define deep neural network
+class HashingNetBinary(nn.Module):
+
+    def __init__(self):
+        super(HashingNetBinary, self).__init__()
+        self.nn1 = nn.Sequential(
+            nn.Conv2d(1, 96, 5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(4, stride=4),
+            nn.LocalResponseNorm(2),
+
+            nn.Conv2d(96, 128, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(4, stride=4),
+            nn.LocalResponseNorm(2),
+
+            nn.Conv2d(128, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(5, stride=5),
+            nn.LocalResponseNorm(2),
+        )
+
+        self.nn2 = nn.Sequential(
+            nn.Linear(6400, 1024),
+            nn.ReLU(inplace=True),
+            nn.Linear(1024, 512),
+            nn.ReLU(inplace=True),
+            nn.Linear(512, 32),
+        )
+
+    def forward(self, x):
+        temp = self.nn1(x)
+        temp = temp.view(temp.size(0), -1)
+        output = self.nn2(temp)
+        return output
+
 if __name__ == "__main__":
     weights_dir = './params.pth.tar'
 
