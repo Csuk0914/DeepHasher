@@ -43,7 +43,7 @@ if data_type == 'Liver':
             source_pts[3, i * slice_sz + j] = 1
 
     # Generate random slice
-    f = randTrans4x4(debug=False)
+    f = randTrans4x4(dataset='liver',debug=False)
     print(f)
     trans_pts = np.matmul(f, source_pts)
     for i in range(slice_sz):
@@ -84,7 +84,7 @@ elif data_type == 'Pancreas':
     volume_interp_func = RegularGridInterpolator((x, y, z), data_volume, bounds_error=False, fill_value=0)
 
     # Create source plane
-    slice_sz = 400
+    slice_sz = 512
     source_pts = np.zeros([4, slice_sz*slice_sz])
     for i in range(slice_sz):
         for j in range(slice_sz):
@@ -93,17 +93,17 @@ elif data_type == 'Pancreas':
             source_pts[3, i * slice_sz + j] = 1
 
     # Generate random slice
-    f = randTrans4x4(debug=False)
+    f = randTrans4x4(dataset='pancreas', debug=False)
     print(f)
     trans_pts = np.matmul(f, source_pts)
-    for i in range(slice_sz):
-        for j in range(slice_sz):
-            trans_pts[0, i*slice_sz + j] = trans_pts[0, i*slice_sz + j] + slice_sz/2
-            trans_pts[1, i*slice_sz + j] = trans_pts[1, i*slice_sz + j] + slice_sz/2
+    trans_pts[0, :] = trans_pts[0, :] + slice_sz / 2
+    trans_pts[1, :] = trans_pts[1, :] + slice_sz / 2
     trans_pts = np.transpose(trans_pts)
-    interp_vals = volume_interp_func(trans_pts[:,0:3])
-    random_slice  = np.reshape(interp_vals,(slice_sz,slice_sz))
-    # print(random_slice)
+    interp_vals = volume_interp_func(trans_pts[:, 0:3])
+    random_slice = np.reshape(interp_vals.astype('uint8'), (slice_sz, slice_sz))
+    # print(random_slice[0,0:50])
+    # png.from_array(random_slice, ';8').save("rand_slice.png")
+    # scipy.misc.imsave('outfile.jpg', random_slice)
 
     # Visualization
     plt.imshow(random_slice)

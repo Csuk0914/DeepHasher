@@ -18,17 +18,23 @@ def randRot3():
     return M
 
 
-def randTrans4x4(debug=False):
+def randTrans4x4(dataset='pancreas',debug=False):
     """
     Generate random 4x4 transformation
     """
     if debug:
         F = np.diag([1,1,1,1])
     else:
-        F = np.zeros([4, 4])
-        F[0:3, 0:3] = randRot3()
-        F[2, 3] = np.random.rand(1) * 254 - 87.76
-        F[3, 3] = 1.0
+        if dataset == 'pancreas':
+            F = np.zeros([4, 4])
+            F[0:3, 0:3] = randRot3()
+            F[2, 3] = np.random.rand(1) * (-239.0)
+            F[3, 3] = 1.0
+        elif dataset == 'liver':
+            F = np.zeros([4, 4])
+            F[0:3, 0:3] = randRot3()
+            F[2, 3] = np.random.rand(1) * 254 - 87.76
+            F[3, 3] = 1.0
 
     return F
 
