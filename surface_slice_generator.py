@@ -2,6 +2,7 @@ import numpy as np
 import pydicom
 import os
 import matplotlib.pyplot as plt
+import imageio
 from scipy.interpolate import RegularGridInterpolator
 from stl import mesh
 
@@ -68,9 +69,11 @@ print(F)
 trans_pts = np.matmul(F, source_pts)
 trans_pts = np.transpose(trans_pts)
 interp_vals = volume_interp_func(trans_pts[:,0:3])
-random_slice  = np.reshape(interp_vals.astype('uint8'),(slice_sz,slice_sz))
-# print(random_slice)
+surface_slice  = np.reshape(interp_vals.astype('uint8'),(slice_sz,slice_sz))
+us_mask = imageio.imread('./us_mask.bmp')
+surface_slice = np.transpose(surface_slice)
+surface_slice = surface_slice * us_mask
 
 # Visualization
-plt.imshow(random_slice)
+plt.imshow(surface_slice)
 plt.show()

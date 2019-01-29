@@ -2,8 +2,8 @@
 import numpy as np
 import pydicom
 import os
-from helper import randTrans4x4
 import matplotlib.pyplot as plt
+from helper import randTrans4x4
 from scipy.interpolate import RegularGridInterpolator
 # from scipy.ndimage.interpolation import rotate
 
