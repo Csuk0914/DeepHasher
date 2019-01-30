@@ -8,8 +8,8 @@ from stl import mesh
 
 # Read skin surface mesh for placing images
 mesh_test = mesh.Mesh.from_file('./STLRead/surface_skin_LPS_simplified.stl')
-vertice_test = mesh_test.vectors[500,:,:]
-normal_test = mesh_test.normals[500,:]
+vertice_test = mesh_test.vectors[2,:,:]
+normal_test = mesh_test.normals[2,:]
 face_center = np.mean(vertice_test,axis=0)
 
 # Read volume data from /test folder
@@ -45,7 +45,7 @@ source_pts = np.zeros([4, slice_sz*slice_sz])
 for i in range(slice_sz):
     for j in range(slice_sz):
         source_pts[0, i * slice_sz + j] = i - slice_sz / 2
-        source_pts[1, i * slice_sz + j] = j
+        source_pts[1, i * slice_sz + j] = j - 9 # slide up by 9 pixels
         source_pts[3, i * slice_sz + j] = 1
 
 # generate rotation
