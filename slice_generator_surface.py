@@ -8,8 +8,8 @@ from stl import mesh
 
 # Read skin surface mesh for placing images
 mesh_test = mesh.Mesh.from_file('./STLRead/surface_skin_LPS_simplified.stl')
-vertice_test = mesh_test.vectors[2,:,:]
-normal_test = mesh_test.normals[2,:]
+vertice_test = mesh_test.vectors[3,:,:]
+normal_test = mesh_test.normals[3,:]
 face_center = np.mean(vertice_test,axis=0)
 
 # Read volume data from /test folder
@@ -59,9 +59,8 @@ v_z = v_z/np.linalg.norm(v_z)
 v_x = np.cross(v_y, v_z)
 v_x = v_x/np.linalg.norm(v_x)
 
-# Generate full transformation
 F = np.zeros([4, 4])
-F[0:3, 0:3] = np.array([v_x, v_y, v_z])
+F[0:3, 0:3] = np.transpose(np.array([v_x, v_y, v_z]))
 F[0:3, 3] = face_center
 F[3,3] = 1.0
 print(F)
