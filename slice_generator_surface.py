@@ -8,8 +8,8 @@ from stl import mesh
 
 # Read skin surface mesh for placing images
 mesh_test = mesh.Mesh.from_file('./STLRead/surface_skin_LPS_simplified.stl')
-vertice_test = mesh_test.vectors[3,:,:]
-normal_test = mesh_test.normals[3,:]
+vertice_test = mesh_test.vectors[16,:,:]
+normal_test = mesh_test.normals[16,:]
 face_center = np.mean(vertice_test,axis=0)
 
 # Read volume data from /test folder
