@@ -8,8 +8,8 @@ from PIL import Image
 from stl import mesh
 
 # Set image files
-num_train_imgs = 20
-num_test_imgs = 0
+num_train_imgs = 50000
+num_test_imgs = 5000
 
 # Set image saving path
 # for marcc
@@ -19,8 +19,8 @@ num_test_imgs = 0
 # data_train_path = "X:/Baichuan_Files/data/data_train/"
 # data_test_path = "X:/Baichuan_Files/data/data_test/"
 # for local pc
-data_train_path = "../data_train3/"
-data_test_path = "../data_test3/"
+data_train_path = "../data_train_real/"
+data_test_path = "../data_test_real/"
 
 # Read volume data from /test folder
 dirname = '../test2'
@@ -105,7 +105,7 @@ def image_gen(stl_id, img_id):
     img_pth = os.path.join(data_train_path, 'img_(%d).png' % img_id)
     im.save(img_pth)
     # Print out process
-    if img_id % (num_train_imgs/10) == 0:
+    if img_id % (num_train_imgs/100) == 0:
         print("Generated %d images, of total %d images" % (img_id, num_train_imgs))
     return label
 
@@ -123,4 +123,16 @@ if num_train_imgs!=0:
 
     label_pth = os.path.join(data_train_path, 'label.csv')
     np.savetxt(label_pth, label_train_all, delimiter=",")
+
+if num_test_imgs!=0:
+    label_test_all = np.zeros([num_test_imgs, 9])
+    while img_idx != num_train_imgs + num_test_imgs:
+        label_test = image_gen(stl_idx, img_idx-num_train_imgs)
+        if label_test.any():
+            label_test_all[img_idx-num_train_imgs, :] = label_test
+            img_idx += 1
+        stl_idx += 1
+
+    label_pth = os.path.join(data_test_path, 'label.csv')
+    np.savetxt(label_pth, label_test_all, delimiter=",")
 

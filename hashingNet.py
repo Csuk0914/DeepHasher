@@ -19,9 +19,7 @@ configs = {"batch_train": 8, \
             "batch_test": 8, \
             "epochs": 40, \
             "num_workers": 0, \
-            "learning_rate": 1e-6, \
-            "loss_margin": 1.0, \
-            "decision_thresh": 13}
+            "learning_rate": 1e-6}
 
 def randRot3():
     """Generate a 3D random rotation matrix.
@@ -135,7 +133,7 @@ class SliceDataSetUnlimited(Dataset):
 class SliceDataSet(Dataset):
     """slice data set."""
 
-    def __init__(self, data_dir='../data_train/', slice_sz = 400):
+    def __init__(self, data_dir='../data_train/', slice_sz = 512):
         self.data_dir = data_dir
         self.labels = self.parseFiles(data_dir)
         self.slice_sz = slice_sz
@@ -188,12 +186,12 @@ class HashingNet(nn.Module):
 
             nn.Conv2d(128, 256, 3, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(5, stride=5),
+            nn.MaxPool2d(4, stride=4),
             nn.LocalResponseNorm(2),
         )
 
         self.nn2 = nn.Sequential(
-            nn.Linear(6400, 1024),
+            nn.Linear(16384, 1024),
             nn.ReLU(inplace=True),
             nn.Linear(1024, 512),
             nn.ReLU(inplace=True),
@@ -243,11 +241,11 @@ class HashingNetBinary(nn.Module):
         return output
 
 if __name__ == "__main__":
-    weights_dir = './params.pth.tar'
+    weights_dir = './params_surface.pth.tar'
 
     # Training process setup
-    # slice_train = SliceDataSet(data_dir='../data_train/')
-    slice_train = SliceDataSetUnlimited(data_dir='../test')
+    slice_train = SliceDataSet(data_dir='../data_train_real/')
+    # slice_train = SliceDataSetUnlimited(data_dir='../test')
     train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
 
     # Training the net
@@ -277,7 +275,7 @@ if __name__ == "__main__":
             mse_loss.backward()
             optimizer.step()
 
-            if batch_idx % (len(slice_train)/configs['batch_train']/5) == 0:
+            if batch_idx % (len(slice_train)/configs['batch_train']/50) == 0:
                 print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
                 iteration += 20
                 counter.append(iteration)
