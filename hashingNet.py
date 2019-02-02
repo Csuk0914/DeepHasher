@@ -133,7 +133,7 @@ class SliceDataSetUnlimited(Dataset):
 class SliceDataSet(Dataset):
     """slice data set."""
 
-    def __init__(self, data_dir='../data_train/', slice_sz = 512):
+    def __init__(self, data_dir='../data_train/', slice_sz = 256):
         self.data_dir = data_dir
         self.labels = self.parseFiles(data_dir)
         self.slice_sz = slice_sz
@@ -191,7 +191,7 @@ class HashingNet(nn.Module):
         )
 
         self.nn2 = nn.Sequential(
-            nn.Linear(16384, 1024),
+            nn.Linear(4096, 1024),
             nn.ReLU(inplace=True),
             nn.Linear(1024, 512),
             nn.ReLU(inplace=True),
@@ -244,9 +244,9 @@ if __name__ == "__main__":
     weights_dir = './params_surface.pth.tar'
 
     # Training process setup
-    slice_train = SliceDataSet(data_dir='../data_train_real/')
+    slice_train = SliceDataSet(data_dir='../data/bjiang8/data_train_real/')
     # slice_train = SliceDataSetUnlimited(data_dir='../test')
-    train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
+    train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=True, num_workers=configs['num_workers'])
 
     # Training the net
     net = HashingNet().cuda()
@@ -275,9 +275,9 @@ if __name__ == "__main__":
             mse_loss.backward()
             optimizer.step()
 
-            if batch_idx % (len(slice_train)/configs['batch_train']/50) == 0:
+            if batch_idx % (len(slice_train)/configs['batch_train']/10) == 0:
                 print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
-                iteration += 20
+                iteration += 10
                 counter.append(iteration)
                 loss_history.append(mse_loss.item())
 
