@@ -17,8 +17,8 @@ from torch.utils.data import Dataset, DataLoader
 # Setting up configuration
 configs = {"batch_train": 8, \
             "batch_test": 8, \
-            "epochs": 40, \
-            "num_workers": 0, \
+            "epochs": 20, \
+            "num_workers": 4, \
             "learning_rate": 1e-6}
 
 def randRot3():

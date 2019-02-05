@@ -10,12 +10,12 @@ from torch.utils.data import DataLoader
 if __name__ == "__main__":
     print("running in eval() main function...")
 
-    weights_dir = "./params.pth.tar"
+    weights_dir = "./params_surface.pth.tar"
     net = HashingNet().cuda()
     net.load_state_dict(torch.load(weights_dir))
     net.eval()
     loss_fn = nn.MSELoss()
-    slice_test = SliceDataSet(data_dir='X:/Baichuan_Files/data/data_test')
+    slice_test = SliceDataSet(data_dir='../data/bjiang8/data_train_real')
     test_loader = DataLoader(slice_test, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
     total_loss = 0.0
     total_diff_center = 0.0
