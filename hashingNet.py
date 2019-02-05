@@ -17,7 +17,7 @@ from torch.utils.data import Dataset, DataLoader
 # Setting up configuration
 configs = {"batch_train": 8, \
             "batch_test": 8, \
-            "epochs": 20, \
+            "epochs": 30, \
             "num_workers": 4, \
             "learning_rate": 1e-6}
 
@@ -241,7 +241,7 @@ class HashingNetBinary(nn.Module):
         return output
 
 if __name__ == "__main__":
-    weights_dir = './params_surface.pth.tar'
+    weights_dir = './params_surface2.pth.tar'
 
     # Training process setup
     slice_train = SliceDataSet(data_dir='../data/bjiang8/data_train_real/')
