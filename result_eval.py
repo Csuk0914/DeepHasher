@@ -10,13 +10,13 @@ from torch.utils.data import DataLoader
 if __name__ == "__main__":
     print("running in eval() main function...")
 
-    weights_dir = "./params_surface.pth.tar"
+    weights_dir = "./params_surface2.pth.tar"
     net = HashingNet().cuda()
     net.load_state_dict(torch.load(weights_dir))
     net.eval()
     loss_fn = nn.MSELoss()
-    slice_test = SliceDataSet(data_dir='../data/bjiang8/data_train_real')
-    test_loader = DataLoader(slice_test, batch_size=configs['batch_train'], shuffle=False, num_workers=configs['num_workers'])
+    slice_test = SliceDataSet(data_dir='../data/bjiang8/data_test_real')
+    test_loader = DataLoader(slice_test, batch_size=configs['batch_train'], shuffle=False, num_workers=1)
     total_loss = 0.0
     total_diff_center = 0.0
     total_diff_normal = 0.0
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         total_diff_normal += diff_normal
         # if batch_idx==0:
         #     break
-        if batch_idx % (len(slice_test) / configs['batch_test'] / 5) == 0:
+        if batch_idx % (len(slice_test) / configs['batch_test'] / 10) == 0:
             print("Batch %d: translation error %f (mm), rotation error %f (deg). " % (batch_idx, diff_center, diff_normal))
 
     mean_diff_center = total_diff_center / float(len(slice_test) / configs['batch_test'])
