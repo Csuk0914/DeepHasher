@@ -8,7 +8,7 @@ from PIL import Image
 from stl import mesh
 
 # Set image files
-num_train_imgs = 50000
+num_train_imgs = 0
 num_test_imgs = 5000
 
 # Set image saving path
@@ -64,7 +64,7 @@ mesh_test = mesh.Mesh.from_file('./STLRead/surface_skin_LPS_simplified.stl')
 us_mask = imageio.imread('./us_mask.bmp')
 
 # Generate training dataset using parallel package
-def image_gen(stl_id, img_id):
+def image_gen(stl_id, img_id, save_path, num_total):
     # From surface mesh get center and normal vector
     vertice_test = mesh_test.vectors[stl_id, :, :]
     normal_test = mesh_test.normals[stl_id, :]
@@ -102,11 +102,11 @@ def image_gen(stl_id, img_id):
     label = trans_anchor_pts[0:3, :].flatten('F')
     # Save image
     im = Image.fromarray(surface_slice)
-    img_pth = os.path.join(data_train_path, 'img_(%d).png' % img_id)
+    img_pth = os.path.join(save_path, 'img_(%d).png' % img_id)
     im.save(img_pth)
     # Print out process
-    if img_id % (num_train_imgs/100) == 0:
-        print("Generated %d images, of total %d images" % (img_id, num_train_imgs))
+    if img_id % (num_total/100) == 0:
+        print("Generated %d images, of total %d images" % (img_id, num_total))
     return label
 
 stl_idx = 0
@@ -115,7 +115,7 @@ img_idx = 0
 if num_train_imgs!=0:
     label_train_all = np.zeros([num_train_imgs, 9])
     while img_idx != num_train_imgs:
-        label_train = image_gen(stl_idx, img_idx)
+        label_train = image_gen(stl_idx, img_idx, data_train_path, num_train_imgs)
         if label_train.any():
             label_train_all[img_idx, :] = label_train
             img_idx += 1
@@ -127,7 +127,7 @@ if num_train_imgs!=0:
 if num_test_imgs!=0:
     label_test_all = np.zeros([num_test_imgs, 9])
     while img_idx != num_train_imgs + num_test_imgs:
-        label_test = image_gen(stl_idx, img_idx-num_train_imgs)
+        label_test = image_gen(stl_idx, img_idx-num_train_imgs, data_test_path, num_test_imgs)
         if label_test.any():
             label_test_all[img_idx-num_train_imgs, :] = label_test
             img_idx += 1
