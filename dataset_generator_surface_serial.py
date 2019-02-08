@@ -6,10 +6,11 @@ import imageio
 from scipy.interpolate import RegularGridInterpolator
 from PIL import Image
 from stl import mesh
+from helper import rotm2axang
 
 # Set image files
-num_train_imgs = 0
-num_test_imgs = 5000
+num_train_imgs = 5000
+num_test_imgs = 500
 
 # Set image saving path
 # for marcc
@@ -19,8 +20,15 @@ num_test_imgs = 5000
 # data_train_path = "X:/Baichuan_Files/data/data_train/"
 # data_test_path = "X:/Baichuan_Files/data/data_test/"
 # for local pc
-data_train_path = "../data_train_real/"
-data_test_path = "../data_test_real/"
+data_train_path = "../data_train_geom/"
+data_test_path = "../data_test_geom/"
+
+label_type = 'geom'
+
+if label_type == 'geom':
+    label_length = 6
+elif label_type == 'anchors':
+    label_length = 9
 
 # Read volume data from /test folder
 dirname = '../test2'
@@ -98,8 +106,13 @@ def image_gen(stl_id, img_id, save_path, num_total):
     surface_slice = surface_slice * us_mask
 
     # Process label
-    trans_anchor_pts = np.matmul(F, source_anchor_pts)
-    label = trans_anchor_pts[0:3, :].flatten('F')
+    if label_type == 'anchors':
+        trans_anchor_pts = np.matmul(F, source_anchor_pts)
+        label = trans_anchor_pts[0:3, :].flatten('F')
+    elif label_type == 'geom':
+        label = np.zeros(6)
+        label[0:3] = rotm2axang(F[0:3, 0:3])
+        label[3:6] = F[0:3, 3]
     # Save image
     im = Image.fromarray(surface_slice)
     img_pth = os.path.join(save_path, 'img_(%d).png' % img_id)
@@ -113,7 +126,7 @@ stl_idx = 0
 img_idx = 0
 
 if num_train_imgs!=0:
-    label_train_all = np.zeros([num_train_imgs, 9])
+    label_train_all = np.zeros([num_train_imgs, label_length])
     while img_idx != num_train_imgs:
         label_train = image_gen(stl_idx, img_idx, data_train_path, num_train_imgs)
         if label_train.any():
@@ -125,7 +138,7 @@ if num_train_imgs!=0:
     np.savetxt(label_pth, label_train_all, delimiter=",")
 
 if num_test_imgs!=0:
-    label_test_all = np.zeros([num_test_imgs, 9])
+    label_test_all = np.zeros([num_test_imgs, label_length])
     while img_idx != num_train_imgs + num_test_imgs:
         label_test = image_gen(stl_idx, img_idx-num_train_imgs, data_test_path, num_test_imgs)
         if label_test.any():
