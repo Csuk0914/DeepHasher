@@ -14,46 +14,18 @@ from torch.autograd import Variable
 from torch import optim
 from torch.utils.data import Dataset, DataLoader
 
-# Setting up configuration
+import geomstats.lie_group as lie_group
+from geomstats.special_euclidean_group import SpecialEuclideanGroup
+
+# Setting up configuration and global variables
 configs = {"batch_train": 8, \
             "batch_test": 8, \
             "epochs": 30, \
             "num_workers": 4, \
             "learning_rate": 1e-6}
 
-def randRot3():
-    """Generate a 3D random rotation matrix.
-    Returns:
-        np.matrix: A 3D rotation matrix.
-    """
-    x1, x2, x3 = np.random.rand(3)
-    R = np.matrix([[np.cos(2 * np.pi * x1), np.sin(2 * np.pi * x1), 0],
-                   [-np.sin(2 * np.pi * x1), np.cos(2 * np.pi * x1), 0],
-                   [0, 0, 1]])
-    v = np.matrix([[np.cos(2 * np.pi * x2) * np.sqrt(x3)],
-                   [np.sin(2 * np.pi * x2) * np.sqrt(x3)],
-                   [np.sqrt(1 - x3)]])
-    H = np.eye(3) - 2 * v * v.T
-    M = -H * R
-    return M
-
-
-def randTrans4x4(debug=False):
-    """
-    Generate random 4x4 transformation
-    """
-    if debug:
-        F = np.diag([1,1,1,1])
-    else:
-        F = np.zeros([4, 4])
-        F[0:3, 0:3] = randRot3()
-        F[2, 3] = np.random.rand(1) * 254 - 87.76
-        F[3, 3] = 1.0
-
-    return F
-
-
-
+SE3_GROUP = SpecialEuclideanGroup(3)
+metric = SE3_GROUP.left_canonical_metric
 
 class SliceDataSetGeom(Dataset):
     """slice data set."""
@@ -165,8 +137,32 @@ class HashingNetBinary(nn.Module):
         output = self.nn2(temp)
         return output
 
+# Define geomstats loss function
+class geom_loss(torch.autograd.Function):
+    """
+    Loss function using geomstats library
+    """
+    @staticmethod
+    def forward(ctx, input, label):
+	# input_np = input.data.numpy()
+	# label_np = label.data.numpy()
+	# ctx.save_for_backward(input_np, label_np)
+	# loss = lie_group.grad(input_np, label_np, SE3_GROUP, metric)
+	# return loss
+        input, label = input.detach(), label.detach()
+        ctx.save_for_backward(input, label)
+        loss = lie_group.grad(input, label, SE3_GROUP, metric)
+        return torch.from_numpy(loss)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        input, label = ctx.saved_tensors
+        grad_input = lie_group.grad(input, label, SE3_GROUP, metric)
+        return torch.from_numpy(grad_input).type(torch.float32).cuda(), None
+
+
 if __name__ == "__main__":
-    weights_dir = './params_surface2.pth.tar'
+    weights_dir = './params_surface3.pth.tar'
 
     # Training process setup
     slice_train = SliceDataSetGeom(data_dir='../data/bjiang8/data_train_real/')
@@ -176,7 +172,7 @@ if __name__ == "__main__":
     # Training the net
     net = HashingNet().cuda()
     optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
-    loss_fn = nn.MSELoss()
+    #loss_fn = geom_loss()
     total_epoch = configs['epochs']
     counter = []
     loss_history = []
@@ -196,19 +192,19 @@ if __name__ == "__main__":
             img, y = Variable(img).cuda(), Variable(label).cuda()
             optimizer.zero_grad()
             y_pred = net(img)
-            mse_loss = loss_fn(y_pred, y)
-            mse_loss.backward()
+            loss = geom_loss.apply(y_pred, y)
+            loss.sum().backward()
             optimizer.step()
 
             if batch_idx % (len(slice_train)/configs['batch_train']/10) == 0:
-                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, mse_loss.item()))
+                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.sum().item()))
                 iteration += 10
                 counter.append(iteration)
-                loss_history.append(mse_loss.item())
+                loss_history.append(loss.sum().item())
 
     torch.save(net.state_dict(), weights_dir)
     total_hist = [counter, loss_history]
-    with open("training_hist.txt", "wb") as fp:
+    with open("training_hist2.txt", "wb") as fp:
         pickle.dump(total_hist, fp)
 
 
