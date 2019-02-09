@@ -144,11 +144,11 @@ class geom_loss(torch.autograd.Function):
     """
     @staticmethod
     def forward(ctx, input, label):
-	# input_np = input.data.numpy()
-	# label_np = label.data.numpy()
-	# ctx.save_for_backward(input_np, label_np)
-	# loss = lie_group.grad(input_np, label_np, SE3_GROUP, metric)
-	# return loss
+        # input_np = input.data.numpy()
+        # label_np = label.data.numpy()
+        # ctx.save_for_backward(input_np, label_np)
+        # loss = lie_group.grad(input_np, label_np, SE3_GROUP, metric)
+        # return loss
         input, label = input.detach(), label.detach()
         ctx.save_for_backward(input, label)
         loss = lie_group.grad(input, label, SE3_GROUP, metric)
@@ -193,7 +193,7 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             y_pred = net(img)
             loss = geom_loss.apply(y_pred, y)
-            loss.sum().backward()
+            loss.backward(torch.ones_like(loss))
             optimizer.step()
 
             if batch_idx % (len(slice_train)/configs['batch_train']/10) == 0:

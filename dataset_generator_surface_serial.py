@@ -9,8 +9,8 @@ from stl import mesh
 from helper import rotm2axang
 
 # Set image files
-num_train_imgs = 5000
-num_test_imgs = 500
+num_train_imgs = 50000
+num_test_imgs = 5000
 
 # Set image saving path
 # for marcc
