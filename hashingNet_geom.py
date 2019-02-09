@@ -47,7 +47,7 @@ class SliceDataSetGeom(Dataset):
         img = torch.from_numpy(imgdata).float()
         img = img.view(1, self.slice_sz, self.slice_sz)
 
-        label = torch.FloatTensor(self.labels[idx][-9:-3])
+        label = torch.FloatTensor(self.labels[idx][-6:])
         sample = {'img': img, 'label': label, 'index': idx}
 
         return sample
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     weights_dir = './params_surface3.pth.tar'
 
     # Training process setup
-    slice_train = SliceDataSetGeom(data_dir='../data/bjiang8/data_train_real/')
+    slice_train = SliceDataSetGeom(data_dir='../data/bjiang8/data_train_geom/')
     # slice_train = SliceDataSetUnlimited(data_dir='../test')
     train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=True, num_workers=configs['num_workers'])
 
@@ -197,14 +197,14 @@ if __name__ == "__main__":
             optimizer.step()
 
             if batch_idx % (len(slice_train)/configs['batch_train']/10) == 0:
-                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.sum().item()))
+                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.abs().sum().item()))
                 iteration += 10
                 counter.append(iteration)
-                loss_history.append(loss.sum().item())
+                loss_history.append(loss.abs().sum().item())
 
     torch.save(net.state_dict(), weights_dir)
     total_hist = [counter, loss_history]
-    with open("training_hist2.txt", "wb") as fp:
+    with open("training_hist.txt", "wb") as fp:
         pickle.dump(total_hist, fp)
 
 
