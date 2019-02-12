@@ -1,7 +1,7 @@
 
 # Evaluate training result on test dataset
 from hashingNet_geom import HashingNet, SliceDataSetGeom, configs
-from helper import compute_error
+from helper import compute_error_geom
 
 import torch
 import torch.nn as nn
@@ -34,7 +34,7 @@ if __name__ == "__main__":
             print(y_np)
             break
 
-        diff_center, diff_normal = compute_error(y_np, y_pred_np)
+        diff_center, diff_normal = compute_error_geom(y_np, y_pred_np)
         total_diff_center += diff_center
         total_diff_normal += diff_normal
         # if batch_idx==0:

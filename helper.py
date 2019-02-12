@@ -62,6 +62,24 @@ def compute_error(gt, re):
     return diff_center_avg, diff_normal_avg
 
 
+def compute_error_geom(y, y_pred):
+    # y for ground truth, y_pred for prediction result
+    diff_normal = 0.0
+    for i in range(y.shape[0]):
+        Ry = axang2rotm(y[i, :3])
+        Ry_pred = axang2rotm(y_pred[i, :3])
+        R_diff = np.matmul(Ry, np.transpose(Ry_pred))
+        w_diff = rotm2axang(R_diff)
+        diff_normal += np.linalg.norm(w_diff)*180/np.pi
+    diff_normal_avg = diff_normal / y.shape[0]
+
+    diff_center = y[:,3:6] - y_pred[:,3:6]
+    diff_center = np.linalg.norm(diff_center, axis=-1)
+    diff_center_avg = diff_center.mean()
+
+    return diff_center_avg, diff_normal_avg
+
+
 def rotm2axang(R):
     """
     Convert the rotation matrix into the axis-angle notation.
