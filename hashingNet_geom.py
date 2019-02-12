@@ -20,7 +20,7 @@ from geomstats.special_euclidean_group import SpecialEuclideanGroup
 # Setting up configuration and global variables
 configs = {"batch_train": 8, \
             "batch_test": 8, \
-            "epochs": 30, \
+            "epochs": 25, \
             "num_workers": 4, \
             "learning_rate": 1e-6}
 
@@ -151,7 +151,7 @@ class geom_loss(torch.autograd.Function):
         # return loss
         input, label = input.detach(), label.detach()
         ctx.save_for_backward(input, label)
-        loss = lie_group.grad(input, label, SE3_GROUP, metric)
+        loss = lie_group.loss(input, label, SE3_GROUP, metric)
         return torch.from_numpy(loss)
 
     @staticmethod
@@ -162,7 +162,7 @@ class geom_loss(torch.autograd.Function):
 
 
 if __name__ == "__main__":
-    weights_dir = './params_surface3.pth.tar'
+    weights_dir = './params_surface4.pth.tar'
 
     # Training process setup
     slice_train = SliceDataSetGeom(data_dir='../data/bjiang8/data_train_geom/')

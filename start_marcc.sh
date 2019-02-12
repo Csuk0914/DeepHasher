@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=hasher
-#SBATCH --time=0-10:0:0
+#SBATCH --time=0-8:0:0
 #SBATCH --partition=gpuk80
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
