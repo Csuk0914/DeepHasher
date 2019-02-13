@@ -29,12 +29,8 @@ if __name__ == "__main__":
         y_pred_np = y_pred.to(torch.device("cpu")).detach().numpy()
         y_np = y.to(torch.device("cpu")).detach().numpy()
 
-        if batch_idx == 0:
-            print(y_pred_np)
-            print(y_np)
-            break
-
         diff_center, diff_normal = compute_error_geom(y_np, y_pred_np)
+        
         total_diff_center += diff_center
         total_diff_normal += diff_normal
         # if batch_idx==0:
