@@ -240,6 +240,13 @@ class HashingNetBinary(nn.Module):
         output = self.nn2(temp)
         return output
 
+def init_weights(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform(m.weight)
+        m.bias.data.fill_(0.01)
+    if type(m) == nn.Conv2d:
+        torch.nn.init.xavier_uniform(m.weight)
+
 if __name__ == "__main__":
     weights_dir = './params_surface2.pth.tar'
 
@@ -250,6 +257,7 @@ if __name__ == "__main__":
 
     # Training the net
     net = HashingNet().cuda()
+    net.apply(init_weights)
     optimizer = optim.Adam(net.parameters(), lr = configs['learning_rate'])
     loss_fn = nn.MSELoss()
     total_epoch = configs['epochs']
