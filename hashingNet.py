@@ -242,10 +242,10 @@ class HashingNetBinary(nn.Module):
 
 def init_weights(m):
     if type(m) == nn.Linear:
-        torch.nn.init.xavier_uniform(m.weight)
+        torch.nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
     if type(m) == nn.Conv2d:
-        torch.nn.init.xavier_uniform(m.weight)
+        torch.nn.init.xavier_uniform_(m.weight)
 
 if __name__ == "__main__":
     weights_dir = './params_surface2.pth.tar'
@@ -264,13 +264,6 @@ if __name__ == "__main__":
     counter = []
     loss_history = []
     iteration = 0
-
-    # def weights_init(m):
-    #     if isinstance(m, nn.Conv2d):
-    #         xavier(m.weight.data)
-    #         xavier(m.bias.data)
-    #
-    # model.apply(weights_init)
 
     for epoch in range(total_epoch):
         for batch_idx, batch_sample in enumerate(train_loader):
