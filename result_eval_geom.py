@@ -36,6 +36,8 @@ if __name__ == "__main__":
         # if batch_idx==0:
         #     break
         if batch_idx % (len(slice_test) / configs['batch_test'] / 10) == 0:
+            print("y_pred: ", y_pred[0,:])
+            print("y: ", y[0,:])
             print("Batch %d: translation error %f (mm), rotation error %f (deg). " % (batch_idx, diff_center, diff_normal))
 
     mean_diff_center = total_diff_center / float(len(slice_test) / configs['batch_test'])

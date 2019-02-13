@@ -10,21 +10,21 @@ from helper import rotm2axang
 from math import floor
 
 # Set image files
-num_train_imgs = 50000
-num_test_imgs = 5000
+num_train_imgs = 200000
+num_test_imgs = 10000
 
 # Set image saving path
 # for marcc
-# data_train_path = "../data/bjiang8/data_train/"
-# data_test_path = "../data/bjiang8/data_test/"
+data_train_path = "../data/bjiang8/data_train_real_random/"
+data_test_path = "../data/bjiang8/data_test_real_random/"
 # for camp pc
 # data_train_path = "X:/Baichuan_Files/data/data_train/"
 # data_test_path = "X:/Baichuan_Files/data/data_test/"
 # for local pc
-data_train_path = "../data_train_geom/"
-data_test_path = "../data_test_geom/"
+# data_train_path = "../data_train_geom/"
+# data_test_path = "../data_test_geom/"
 
-label_type = 'geom'
+label_type = 'anchors'
 
 if label_type == 'geom':
     label_length = 6
