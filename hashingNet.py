@@ -248,10 +248,10 @@ def init_weights(m):
         torch.nn.init.xavier_uniform_(m.weight)
 
 if __name__ == "__main__":
-    weights_dir = './params_surface2.pth.tar'
+    weights_dir = './params_surface_real.pth.tar'
 
     # Training process setup
-    slice_train = SliceDataSet(data_dir='../data/bjiang8/data_train_real/')
+    slice_train = SliceDataSet(data_dir='../data/bjiang8/data_train_real_random/')
     # slice_train = SliceDataSetUnlimited(data_dir='../test')
     train_loader = DataLoader(slice_train, batch_size=configs['batch_train'], shuffle=True, num_workers=configs['num_workers'])
 
@@ -284,7 +284,7 @@ if __name__ == "__main__":
 
     torch.save(net.state_dict(), weights_dir)
     total_hist = [counter, loss_history]
-    with open("training_hist.txt", "wb") as fp:
+    with open("training_hist_real.txt", "wb") as fp:
         pickle.dump(total_hist, fp)
 
 

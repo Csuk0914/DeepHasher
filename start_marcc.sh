@@ -1,10 +1,10 @@
 #!/bin/bash -l
 #SBATCH --job-name=hasher
-#SBATCH --time=0-8:0:0
+#SBATCH --time=0-16:0:0
 #SBATCH --partition=gpuk80
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
-#SBATCH --mem=8G
+#SBATCH --mem=16G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=bjiang8@jhu.edu
 #SBATCH --export=ALL
@@ -17,5 +17,5 @@ module load pytorch cuda/9.0
 export PATH=$HOME/.local/bin/:$PATH
 export PYTHONPATH=$HOME/.local/lib/python3.5/site-packages/:$PYTHONPATH
 
-python $HOME/DeepHasher/hashingNet_geom.py
+python $HOME/DeepHasher/hashingNet.py
 
