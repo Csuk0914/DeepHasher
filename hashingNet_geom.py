@@ -20,7 +20,7 @@ from geomstats.special_euclidean_group import SpecialEuclideanGroup
 # Setting up configuration and global variables
 configs = {"batch_train": 8, \
             "batch_test": 8, \
-            "epochs": 25, \
+            "epochs": 30, \
             "num_workers": 4, \
             "learning_rate": 1e-6}
 
@@ -152,7 +152,7 @@ class geom_loss(torch.autograd.Function):
         input, label = input.detach(), label.detach()
         ctx.save_for_backward(input, label)
         loss = lie_group.loss(input, label, SE3_GROUP, metric)
-        return torch.from_numpy(loss)
+        return torch.tensor(np.mean(loss))
 
     @staticmethod
     def backward(ctx, grad_output):
@@ -168,7 +168,12 @@ def init_weights(m):
         torch.nn.init.xavier_uniform_(m.weight)
 
 if __name__ == "__main__":
-    weights_dir = './params_surface4.pth.tar'
+    weights_dir = './params_surface_geom.pth.tar'
+    training_hist_dir = 'training_hist_geom.txt'
+    
+    print("weights_file: ", weights_dir)
+    print("training_hist_file: ", training_hist_dir)
+    print("configs: ", configs)
 
     # Training process setup
     slice_train = SliceDataSetGeom(data_dir='../data/bjiang8/data_train_geom/')
@@ -197,14 +202,14 @@ if __name__ == "__main__":
             optimizer.step()
 
             if batch_idx % (len(slice_train)/configs['batch_train']/10) == 0:
-                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.abs().sum().item()))
+                print("Epoch %d, Batch %d Loss %f" % (epoch, batch_idx, loss.item()))
                 iteration += 10
                 counter.append(iteration)
-                loss_history.append(loss.abs().sum().item())
+                loss_history.append(loss.item())
 
     torch.save(net.state_dict(), weights_dir)
     total_hist = [counter, loss_history]
-    with open("training_hist.txt", "wb") as fp:
+    with open(training_hist_dir, "wb") as fp:
         pickle.dump(total_hist, fp)
 
 

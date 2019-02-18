@@ -17,7 +17,7 @@ from torch.utils.data import Dataset, DataLoader
 # Setting up configuration
 configs = {"batch_train": 8, \
             "batch_test": 8, \
-            "epochs": 30, \
+            "epochs": 15, \
             "num_workers": 4, \
             "learning_rate": 1e-6}
 
@@ -249,6 +249,12 @@ def init_weights(m):
 
 if __name__ == "__main__":
     weights_dir = './params_surface_real.pth.tar'
+    train_hist_dir = 'training_hist_real.txt'
+
+    print("New training started..."
+    print("weights_file: ", weights_dir)
+    print("training_hist_file: ", train_hist_dir)
+    print("configs: ", configs)
 
     # Training process setup
     slice_train = SliceDataSet(data_dir='../data/bjiang8/data_train_real_random/')
@@ -284,7 +290,7 @@ if __name__ == "__main__":
 
     torch.save(net.state_dict(), weights_dir)
     total_hist = [counter, loss_history]
-    with open("training_hist_real.txt", "wb") as fp:
+    with open(train_hist_dir, "wb") as fp:
         pickle.dump(total_hist, fp)
 
 
