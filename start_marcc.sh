@@ -1,10 +1,10 @@
 #!/bin/bash -l
 #SBATCH --job-name=hasher_geom
-#SBATCH --time=0-10:0:0
+#SBATCH --time=0-12:0:0
 #SBATCH --partition=gpuk80
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
-#SBATCH --mem=16G
+#SBATCH --mem=8G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=bjiang8@jhu.edu
 #SBATCH --export=ALL

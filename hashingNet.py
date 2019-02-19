@@ -251,7 +251,7 @@ if __name__ == "__main__":
     weights_dir = './params_surface_real.pth.tar'
     train_hist_dir = 'training_hist_real.txt'
 
-    print("New training started..."
+    print("New training started...")
     print("weights_file: ", weights_dir)
     print("training_hist_file: ", train_hist_dir)
     print("configs: ", configs)

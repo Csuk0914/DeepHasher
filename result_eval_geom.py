@@ -16,7 +16,7 @@ metric = SE3_GROUP.left_canonical_metric
 if __name__ == "__main__":
     print("running in eval() main function...")
 
-    weights_dir = "./params_surface_geom.pth.tar"
+    weights_dir = "./params_surface_geom3.pth.tar"
     net = HashingNet().cuda()
     net.load_state_dict(torch.load(weights_dir))
     net.eval()
@@ -48,8 +48,8 @@ if __name__ == "__main__":
             print("y: ", y[0,:])
             print("loss: ", loss)
             print("grad: ", grad)
-            print("Batch %d: translation error %f (mm), rotation error %f (deg). " % (batch_idx, diff_center, diff_normal))
+            print("Batch %d: translation error %f (mm), rotation error %f (deg). " % (batch_idx, diff_center*1000, diff_normal))
 
     mean_diff_center = total_diff_center / float(len(slice_test) / configs['batch_test'])
     mean_diff_normal = total_diff_normal / float(len(slice_test) / configs['batch_test'])
-    print("Average translation error %f (mm), average rotation error %f (deg).", mean_diff_center, mean_diff_normal)
+    print("Average translation error %f (mm), average rotation error %f (deg).", mean_diff_center*1000, mean_diff_normal)

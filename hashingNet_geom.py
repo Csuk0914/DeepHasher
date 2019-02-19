@@ -48,6 +48,7 @@ class SliceDataSetGeom(Dataset):
         img = img.view(1, self.slice_sz, self.slice_sz)
 
         label = torch.FloatTensor(self.labels[idx][-6:])
+        label[3:6] = label[3:6]/1000
         sample = {'img': img, 'label': label, 'index': idx}
 
         return sample
@@ -168,8 +169,8 @@ def init_weights(m):
         torch.nn.init.xavier_uniform_(m.weight)
 
 if __name__ == "__main__":
-    weights_dir = './params_surface_geom.pth.tar'
-    training_hist_dir = 'training_hist_geom.txt'
+    weights_dir = './params_surface_geom3.pth.tar'
+    training_hist_dir = 'training_hist_geom3.txt'
     
     print("weights_file: ", weights_dir)
     print("training_hist_file: ", training_hist_dir)
