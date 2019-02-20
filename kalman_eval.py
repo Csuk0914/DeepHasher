@@ -165,9 +165,9 @@ class HashingNetBinary(nn.Module):
 
 
 if __name__ == "__main__":
-    weights_dir = './params_surface.pth.tar'
+    weights_dir = './params_surface2.pth.tar'
     data_file_dir = '../data/bjiang8/series3/'
-    pred_file_name = 'predict.csv'
+    pred_file_name = 'predict2.csv'
 
     print("Kalman test started...")
     print("weights_file: ", weights_dir)
@@ -182,16 +182,26 @@ if __name__ == "__main__":
 
     # Training the net
     net = HashingNet().cuda()
+    net.load_state_dict(torch.load(weights_dir))
+    net.eval()
 
+    label_num = len(slice_train)
+    label_length = 9
+    label_pred = np.zeros([label_num, label_length])
     for batch_idx, batch_sample in enumerate(train_loader):
         img = batch_sample['img']
         label = batch_sample['label']
         img, y = Variable(img).cuda(), Variable(label).cuda()
         y_pred = net(img)
 
-        print(y_pred)
+        y_pred_new = np.squeeze(y_pred.data.cpu().numpy())
+        y_new = np.squeeze(y.data.cpu().numpy())
+        print("--------New--------")
+        print(batch_idx)
+        print(y_new)
+        print(y_pred_new)
+        label_pred[batch_idx, :] = y_pred_new
 
-
-
-
-
+    label_pth = os.path.join(data_file_dir, pred_file_name)
+    #np.savetxt(label_pth, label_pred, delimiter=",")
+    print("Test finished.")
