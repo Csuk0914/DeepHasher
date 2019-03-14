@@ -46,21 +46,21 @@ my_filter.F = np.array([[1.,0,0,T_s, 0, 0],
 my_filter.H = np.array([[1.,0,0,0, 0, 0],
                        [0,1.,0,0, 0, 0],
                        [0,0,1.,0, 0, 0]])    # Measurement function
-my_filter.P = np.array([[50.,0,0,0, 0, 0],
-                        [0,50.,0,0, 0, 0],
-                        [0,0,50.,0, 0, 0],
+my_filter.P = np.array([[150.,0,0,0, 0, 0],
+                        [0,150.,0,0, 0, 0],
+                        [0,0,150.,0, 0, 0],
                         [0,0,0,1., 0, 0],
                         [0,0,0,0, 1., 0],
                         [0,0,0,0, 0, 1.]])    # covariance matrix
-my_filter.R = np.array([[100.,0,0],
-                       [0,100.,0],
-                       [0,0,100.]])            # measurement uncertainty/noise
+my_filter.R = np.array([[1000.,0,0],
+                       [0,1000.,0],
+                       [0,0,1000.]])            # measurement uncertainty/noise
 my_filter.Q = np.array([[1,0,0,0, 0, 0],
                         [0,1,0,0, 0, 0],
                         [0,0,1,0, 0, 0],
-                        [0,0,0,1, 0, 0],
-                        [0,0,0,0, 1, 0],
-                        [0,0,0,0, 0, 1]])  # Process uncertainty/noise
+                        [0,0,0,.1, 0, 0],
+                        [0,0,0,0, .1, 0],
+                        [0,0,0,0, 0, .1]])  # Process uncertainty/noise
 
 # Start filtering process
 idx = 1
@@ -111,7 +111,7 @@ y = pred_filt_rec[:,1]
 z = pred_filt_rec[:,2]
 ax.plot(x, y, z, label='filtered predicts')
 
-ax.legend()
+ax.legend(loc="upper left")
 ax.set_xlim3d([0, 250])
 ax.set_ylim3d([-350, -100])
 ax.set_zlim3d([-250, 0])
